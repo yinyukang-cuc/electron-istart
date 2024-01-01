@@ -1,6 +1,9 @@
-const func = async () => {
-    const response = await window.versions.ping()
-    console.log(response) // 打印 'pong'
-  }
-  
-  func()
+
+
+const setButton = document.getElementById('btn')
+const titleInput = document.getElementById('title')
+
+setButton.addEventListener('click', () => {
+  const title = titleInput.value
+  window.electronAPI.setTitle(title)
+})

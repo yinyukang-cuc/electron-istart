@@ -1,38 +1,31 @@
-const { app, BrowserWindow,ipcMain  } = require('electron/main')
+const { app, BrowserWindow, ipcMain } = require('electron/main')
 const path = require('node:path')
 
-const createWindow = () => {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+function createWindow () {
+  const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   })
 
-  win.loadFile('index.html')
-  // console.log(win.webContents,'webContents')
-  const contents = win.webContents
-  console.log(contents,'contents')
+  ipcMain.on('set-title', (event, title) => {
+    console.log('set-title11')
+    const webContents = event.sender
+    const win = BrowserWindow.fromWebContents(webContents)
+    win.setTitle(title)
+  })
+
+  mainWindow.loadFile('index.html')
 }
 
 app.whenReady().then(() => {
   createWindow()
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
-    }
-  })
-
-  ipcMain.handle('ping', (event,data) =>{
-    console.log(data)
-    return 'pong'
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
 })
